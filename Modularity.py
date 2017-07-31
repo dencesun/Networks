@@ -28,8 +28,6 @@ class Modularity(object):
         m = np.sum(degree_centrality, dtype=int)/2
 
         # compute matrix B
-
-
         B = np.zeros(A.shape, dtype=float)
 
         for i in range(len(A)):
