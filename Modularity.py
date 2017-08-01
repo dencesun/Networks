@@ -50,6 +50,7 @@ class Modularity(object):
 
 
 def main():
+
     g = nx.karate_club_graph()
 
     Q = Modularity(g)
