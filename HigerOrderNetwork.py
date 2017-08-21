@@ -234,30 +234,38 @@ class HigerOrderNetwork(object):
     def SpectralPartitioning(self, A):
         part_vec, x= self.nfiedler(A)
         # print(part_vec)
-        # print(np.argsort(part_vec))
+        order = np.argsort(part_vec)
+        print('\norder\n', order)
 
     def nfiedler(self, A = None, tol = 1e-12):
         # if A == None:
         #     print('Error! matrix A is None..')
         #     return None
         L = self.nlaplacian(A)
+        # print('L\n', L, '\n')
         n = A.shape[0]
         # print(n)
         eigvalue, eigvector = SLA.eigh(L + np.eye(n))
+        # print('eigvalue\n', eigvalue)
+        # print('eigvector\n', eigvector[:, 0], '\n\n', eigvector[:, 1])
         # print(L + np.eye(n))
-        print('eigvalue\n', eigvalue)
+        # print('eigvalues\n', eigvalue)
         # print('eigvalue\n', eigvalue[:2])
         # print('eigvector\n', eigvector[0:1])
         # print(eigvalue)
-        x = eigvector[1]
+        x = eigvector[:, 1]
+        # print('\n\nx\n', x, '\n')
         # print(x)
         x = x/(np.sqrt(np.sum(A, 1)).T)
-        # print(x)
+        # x = x.T
+        # print('\nx\n', x.T)
         eigvalue  = eigvalue[1] - 1
-        print(eigvalue)
-        print(np.argsort(eigvector[1]))
-        print(eigvector[1])
+        # print('\neigvalue\n', eigvalue)
+        # print('\nnp.argsort(e+igvector[1])\n', np.argsort(eigvector[1]), '\n')
+        # print('eigvector[1]\n', eigvector[1])
 
+        print('\nx\n', x)
+        print('\neigvalue\n', eigvalue)
         return x, eigvalue
 
     def nlaplacian(self, A):
