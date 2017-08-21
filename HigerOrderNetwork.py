@@ -14,6 +14,10 @@ import networkx as nx
 import numpy as np
 from scipy import linalg as SLA
 from numpy import linalg as NLA
+import math
+import matplotlib.pyplot as plt
+
+np.seterr(divide='ignore', invalid='ignore')
 
 class HigerOrderNetwork(object):
     def __init__(self, graph):
@@ -235,7 +239,61 @@ class HigerOrderNetwork(object):
         part_vec, x= self.nfiedler(A)
         # print(part_vec)
         order = np.argsort(part_vec)
-        print('\norder\n', order)
+        # order = np.array([9,7,8, 5,6, 1, 4, 0, 3, 2])
+        # order = np.mat(order)
+        # print('\norder\n', order)
+        # print(A)
+        n = order.shape[1]
+        crtesianProduct = [(order[0, i], order[0, j]) for i in range(n) for j in range(n)]
+        B = np.zeros([n, n])
+        for i in range(len(crtesianProduct)):
+            # print(int(i/10), i%10)
+            # print(crtesianProduct[i][0], crtesianProduct[i][1])
+            B[int(i/10), i%10] = A[crtesianProduct[i][0], crtesianProduct[i][1]]
+        # print('B\n', B)
+        B_lower = np.tril(B)
+        # print('B_lower\n', B_lower)
+        B_sums = np.mat(B.sum(axis = 1)).T
+        # print('B_sums\n', B_sums)
+        B_lower_sums = np.mat(B_lower.sum(axis = 1)).T
+        # print('B_lower_sums\n', B_lower_sums)
+        volumes = np.cumsum(B_sums, axis = 0)
+        # print('\nB_sums\n', B_sums)
+        # print('\nvolumes\n', volumes)
+        # print('B_sums-2*B_lower_sums\n', B_sums-2*B_lower_sums)
+        num_cut = np.cumsum(B_sums-2*B_lower_sums, axis = 0)
+        # print('num_cut\n', num_cut)
+        total_vol = np.sum(A)
+        # print('total_vol\n', total_vol)
+        volumes_other = total_vol * np.ones((order.shape[1], 1)) - volumes
+        # print('\nvolumes_other\n', volumes_other)
+        vols = np.fmin(volumes, volumes_other)
+        # print('vols\n', vols)
+        scores = num_cut / vols
+        # print('\nscores\n', scores)
+        scores = scores[0:-1, :]
+        print('scores\n', scores)
+        min_ind = np.argmin(scores)
+        condc = scores[min_ind, 0]
+        # print(min_ind, condc)
+        n = A.shape[0]
+        if min_ind <= math.floor(n/2):
+            cluster = order[0, 0:min_ind+1]
+        else:
+            cluster = order[0, min_ind+1:n]
+
+        # print('scores\n', scores)
+        # print('scores[::-1, 0]\n', scores[::-1, 0])
+        condv = np.fmin(scores, scores[::-1, :])
+        # print('condv\n', condv)
+        condv = condv[0:math.ceil(scores.shape[0]/2), :]
+        # print(condv)
+        # 画图验证正确性
+        x = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        plt.plot(x, scores[:, 0])
+        # plt.show()
+        plt.savefig('demo.svg')
+        return cluster, condv, condc, order
 
     def nfiedler(self, A = None, tol = 1e-12):
         # if A == None:
@@ -264,8 +322,8 @@ class HigerOrderNetwork(object):
         # print('\nnp.argsort(e+igvector[1])\n', np.argsort(eigvector[1]), '\n')
         # print('eigvector[1]\n', eigvector[1])
 
-        print('\nx\n', x)
-        print('\neigvalue\n', eigvalue)
+        # print('\nx\n', x)
+        # print('\neigvalue\n', eigvalue)
         return x, eigvalue
 
     def nlaplacian(self, A):
@@ -329,7 +387,8 @@ def main():
     W = test.MotifAdjacency('m7')
     # print('W\n', W)
     # test.nfiedler(W)
-    test.SpectralPartitioning(W)
+    cluster, condv, condc, order = test.SpectralPartitioning(W)
+    print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\nncondc\n', condc, '\n\norder\n', order)
 
 if __name__ == '__main__':
     main()
