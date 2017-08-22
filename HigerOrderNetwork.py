@@ -24,8 +24,16 @@ class HigerOrderNetwork(object):
         self.graph = nx.to_numpy_matrix(graph, dtype=int)
 
     def MotifAdjacency(self, motif = None):
-        A = self.graph
+        """
+        MotifAdjacency forms the motif adjacency matrix for the adjacency matrix A and the specified motif
 
+        :param motif: motif is one of
+        m1, m2, m3, m4, m5, m6, m7, m8. m9, m10, m11, m12, m13, bifan, etc
+        :return: W = MotifAdjacency(motif)
+                 W: the motif adjacency matrix
+        """
+        A = self.graph
+        # print(type(A))
         # ignore diagonals and weights
         A = A - np.diag(np.diag(A))
         A[A > 1] = 1
@@ -72,7 +80,6 @@ class HigerOrderNetwork(object):
             print('Error.\nUnknown motif: ', self.motif)
             return None
 
-        return W
         # print(A)
         # x = np.random.randn(3, 3)
         # x[1, 1] = 0
@@ -81,6 +88,8 @@ class HigerOrderNetwork(object):
         # x[x != 0] = 1
         # print(x)
         # print(x-y)
+
+        return W
 
     def DirectionalBreakup(self, A):
         A[A != 0] = 1
@@ -156,8 +165,10 @@ class HigerOrderNetwork(object):
                         W[k1, k2] = W[k1, k2] + 1
 
         W = W + W.T
+
         # matlab use W = sparse(W + W')
         # I think it is properly use W = W+W'T
+
         return W
 
     def M9(self, A):
@@ -236,15 +247,30 @@ class HigerOrderNetwork(object):
         return None
 
     def SpectralPartitioning(self, A):
+        """
+        SpectralPartitioning performs a spectral partitioning  of A and returns several relevant quantities. It assumes
+        that A is undirected and connected
+
+        :param A: motif adjacency matrix
+        :return:
+                cluster, condv, condc, order = SpectralPartitioning(A)
+                cluster: vector of nodes in the smaller side of partition
+                condv: the sweep conductance vector
+                condc: the conductance of cluster
+                order: the spectral ordering
+        """
         part_vec, x= self.nfiedler(A)
         # print(part_vec)
-        order = np.argsort(part_vec)
+        order = np.argsort(part_vec) # return an index matrix order
+
         # order = np.array([9,7,8, 5,6, 1, 4, 0, 3, 2])
         # order = np.mat(order)
         # print('\norder\n', order)
         # print(A)
+
         n = order.shape[1]
         crtesianProduct = [(order[0, i], order[0, j]) for i in range(n) for j in range(n)]
+        # compute the conductance values (vectorized)
         B = np.zeros([n, n])
         for i in range(len(crtesianProduct)):
             # print(int(i/10), i%10)
@@ -258,9 +284,11 @@ class HigerOrderNetwork(object):
         B_lower_sums = np.mat(B_lower.sum(axis = 1)).T
         # print('B_lower_sums\n', B_lower_sums)
         volumes = np.cumsum(B_sums, axis = 0)
+
         # print('\nB_sums\n', B_sums)
         # print('\nvolumes\n', volumes)
         # print('B_sums-2*B_lower_sums\n', B_sums-2*B_lower_sums)
+
         num_cut = np.cumsum(B_sums-2*B_lower_sums, axis = 0)
         # print('num_cut\n', num_cut)
         total_vol = np.sum(A)
@@ -272,11 +300,12 @@ class HigerOrderNetwork(object):
         scores = num_cut / vols
         # print('\nscores\n', scores)
         scores = scores[0:-1, :]
-        print('scores\n', scores)
+        # print('scores\n', scores)
         min_ind = np.argmin(scores)
         condc = scores[min_ind, 0]
         # print(min_ind, condc)
         n = A.shape[0]
+        # the output cluster is the smaller of the two sides of the partition
         if min_ind <= math.floor(n/2):
             cluster = order[0, 0:min_ind+1]
         else:
@@ -284,26 +313,37 @@ class HigerOrderNetwork(object):
 
         # print('scores\n', scores)
         # print('scores[::-1, 0]\n', scores[::-1, 0])
+
         condv = np.fmin(scores, scores[::-1, :])
         # print('condv\n', condv)
         condv = condv[0:math.ceil(scores.shape[0]/2), :]
+
         # print(condv)
         # 画图验证正确性
         x = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         plt.plot(x, scores[:, 0])
         # plt.show()
         plt.savefig('demo.svg')
+
         return cluster, condv, condc, order
 
     def nfiedler(self, A = None, tol = 1e-12):
-        # if A == None:
-        #     print('Error! matrix A is None..')
-        #     return None
+        """
+        :param A: motif adjacency matrix A
+        :param tol: no uesd in this program
+        :return: the fiedler vector of the normalized laplacian of A
+                 (fiedler vector: eigenvector corresponding to the second smallest eigenvalue)
+        """
+        if A is None:
+            print('Error! matrix A is None..')
+            return None
+
         L = self.nlaplacian(A)
         # print('L\n', L, '\n')
         n = A.shape[0]
         # print(n)
         eigvalue, eigvector = SLA.eigh(L + np.eye(n))
+
         # print('eigvalue\n', eigvalue)
         # print('eigvector\n', eigvector[:, 0], '\n\n', eigvector[:, 1])
         # print(L + np.eye(n))
@@ -311,31 +351,45 @@ class HigerOrderNetwork(object):
         # print('eigvalue\n', eigvalue[:2])
         # print('eigvector\n', eigvector[0:1])
         # print(eigvalue)
+
         x = eigvector[:, 1]
+
         # print('\n\nx\n', x, '\n')
         # print(x)
+
         x = x/(np.sqrt(np.sum(A, 1)).T)
+
         # x = x.T
         # print('\nx\n', x.T)
+
         eigvalue  = eigvalue[1] - 1
+
         # print('\neigvalue\n', eigvalue)
         # print('\nnp.argsort(e+igvector[1])\n', np.argsort(eigvector[1]), '\n')
         # print('eigvector[1]\n', eigvector[1])
-
         # print('\nx\n', x)
         # print('\neigvalue\n', eigvalue)
+
         return x, eigvalue
 
     def nlaplacian(self, A):
+        """
+        :param A: matrix A
+        :return: the normalized laplacian of A
+        """
         d = A.sum(axis = 1) # axis = 0 求每一列的和，axis = 1 求每一行的和
+
         # print(A)
         # print('np.sqrt(d[np.nonzero(d)])\n', np.sqrt(d[np.nonzero(d)]))
         # print('1/np.sqrt(d[np.nonzero(d)])\n', 1/(np.sqrt(d[np.nonzero(d)])).T)
+
         d = 1/np.sqrt(d[np.nonzero(d)]).T
+
         # print('d \n', d)
         # print('type(d)\n', type(d))
         # print(np.nonzero(A)[0].T)
         # print(A[np.nonzero(A)])
+
         x = np.nonzero(A)
         i = x[0]
         j = x[1]
@@ -357,6 +411,27 @@ class HigerOrderNetwork(object):
 
         L = L + np.mat(np.eye(n))
         return L
+
+    def DirectionalBreakup(self, A):
+        """
+        :param A:
+        :return:
+         B: the bidirectional subgraph
+         U: the undirectional subgraph
+         G: the undirected graph
+        """
+
+        A = (A!=0)*1 # replace nonzero elements with one
+        B = np.logical_and(A, A.T)*1
+        U = A - B
+        G = np.logical_and(A, A.T)*1
+
+        # print('A\n', A)
+        # print('B\n', B)
+        # print('U\n', U)
+        # print('G\n', G)
+
+        return B, U, G
 
 
 def main():
@@ -385,8 +460,12 @@ def main():
 
     test = HigerOrderNetwork(g)
     W = test.MotifAdjacency('m7')
+
     # print('W\n', W)
-    # test.nfiedler(W)
+    # print(type(W))
+
+    test.DirectionalBreakup(W)
+    test.nfiedler(W)
     cluster, condv, condc, order = test.SpectralPartitioning(W)
     print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\nncondc\n', condc, '\n\norder\n', order)
 
