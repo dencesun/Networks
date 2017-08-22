@@ -31,6 +31,7 @@ class HigerOrderNetwork(object):
         m1, m2, m3, m4, m5, m6, m7, m8. m9, m10, m11, m12, m13, bifan, etc
         :return: W = MotifAdjacency(motif)
                  W: the motif adjacency matrix
+
         """
         A = self.graph
         # print(type(A))
@@ -258,6 +259,7 @@ class HigerOrderNetwork(object):
                 condv: the sweep conductance vector
                 condc: the conductance of cluster
                 order: the spectral ordering
+
         """
         part_vec, x= self.nfiedler(A)
         # print(part_vec)
@@ -333,6 +335,7 @@ class HigerOrderNetwork(object):
         :param tol: no uesd in this program
         :return: the fiedler vector of the normalized laplacian of A
                  (fiedler vector: eigenvector corresponding to the second smallest eigenvalue)
+
         """
         if A is None:
             print('Error! matrix A is None..')
@@ -376,6 +379,7 @@ class HigerOrderNetwork(object):
         """
         :param A: matrix A
         :return: the normalized laplacian of A
+
         """
         d = A.sum(axis = 1) # axis = 0 求每一列的和，axis = 1 求每一行的和
 
@@ -415,10 +419,11 @@ class HigerOrderNetwork(object):
     def DirectionalBreakup(self, A):
         """
         :param A:
-        :return:
-         B: the bidirectional subgraph
-         U: the undirectional subgraph
-         G: the undirected graph
+        :return: B, U, G = DirectionalBreakup(A)
+                B: the bidirectional subgraph
+                U: the undirectional subgraph
+                G: the undirected graph
+
         """
 
         A = (A!=0)*1 # replace nonzero elements with one
@@ -432,6 +437,21 @@ class HigerOrderNetwork(object):
         # print('G\n', G)
 
         return B, U, G
+
+    def LargestConnectComponent(self, A):
+        """
+        LargestConnectComponent gets the largest connnected component of A
+        A is assumed to be undirected
+
+        :param A: motif adjacency matrix
+        :return: LCC, lcc_inds, ci, sizes = LargestConnectComponent(A)
+                LCC: the largest connected component
+                lcc_inds: the indices in A corresponding to the connected component
+                ci: the component indices of the nodes in A
+                sizes: the sizes of the connected components
+
+        """
+        pass
 
 
 def main():
