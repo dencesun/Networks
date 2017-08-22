@@ -242,8 +242,20 @@ class HigerOrderNetwork(object):
     def Bifan(self, A):
         B, U, G = self.DirectionalBreakup(A)
         NA = np.logical_and((A==0)*1, (A.T == 0)*1)*1
-        # print(NA)
+
         W = np.zeros(G.shape)
+        W = np.mat(W)
+        nzero_ind = np.nonzero(np.triu(NA, 1))
+
+        for ind in range(nzero_ind[0].shape[0]):
+            
+
+        print('U\n', U)
+        print('G\n', G)
+        print('NA\n', NA)
+        print('W\n', W)
+        print('nzero_ind\n', nzero_ind)
+        print(nzero_ind[0].shape[0])
 
         return None
 
@@ -429,7 +441,7 @@ class HigerOrderNetwork(object):
         A = (A!=0)*1 # replace nonzero elements with one
         B = np.logical_and(A, A.T)*1
         U = A - B
-        G = np.logical_and(A, A.T)*1
+        G = np.logical_or(A, A.T)*1
 
         # print('A\n', A)
         # print('B\n', B)
@@ -485,15 +497,16 @@ def main():
     g.add_edge(9, 10)
 
     test = HigerOrderNetwork(g)
-    W = test.MotifAdjacency('m7')
+    W = test.MotifAdjacency('bifan')
 
     # print('W\n', W)
     # print(type(W))
 
-    test.DirectionalBreakup(W)
-    test.nfiedler(W)
-    cluster, condv, condc, order = test.SpectralPartitioning(W)
-    print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\nncondc\n', condc, '\n\norder\n', order)
+
+    # test.DirectionalBreakup(W)
+    # test.nfiedler(W)
+    # cluster, condv, condc, order = test.SpectralPartitioning(W)
+    # print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\nncondc\n', condc, '\n\norder\n', order)
 
 if __name__ == '__main__':
     main()
