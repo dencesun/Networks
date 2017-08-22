@@ -455,6 +455,12 @@ class HigerOrderNetwork(object):
 
 
 def main():
+    """
+    graph data g come from Jure Leskovec(2016) Higher-order organization of complex networks Fig 1
+
+    :return: None
+
+    """
     g = nx.DiGraph()
     g.add_edge(1, 2)
     g.add_edge(1, 3)
