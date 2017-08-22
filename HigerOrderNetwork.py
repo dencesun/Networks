@@ -10,6 +10,7 @@
 
 """
 
+
 import networkx as nx
 import numpy as np
 from scipy import linalg as SLA
@@ -496,4 +497,5 @@ def main():
     print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\nncondc\n', condc, '\n\norder\n', order)
 
 if __name__ == '__main__':
+
     main()
