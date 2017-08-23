@@ -249,16 +249,42 @@ class HigerOrderNetwork(object):
         nzero_ind = np.nonzero(np.triu(NA, 1))
 
         for ind in range(nzero_ind[0].shape[0]):
-            
+            x = nzero_ind[0][ind]
+            y = nzero_ind[1][ind]
+            xout = np.nonzero(U[x, :])
+            yout = np.nonzero(U[y, :])
+            common = np.intersect1d(xout, yout)
+            # print(common)
+            nc = common.shape[0]
+            # print(common[0, 0])
+            for i in range(nc):
+                for j in range(i+1, nc):
+                    w = common[i]
+                    v = common[j]
+                    if NA[w, v] == 1:
+                        W[x, y] = W[x, y] + 1;
+                        W[x, w] = W[x, w] + 1;
+                        W[x, v] = W[x, v] + 1;
+                        W[y, w] = W[y, w] + 1;
+                        W[y, v] = W[y, v] + 1;
+                        W[w, v] = W[w, v] + 1;
 
-        print('U\n', U)
-        print('G\n', G)
-        print('NA\n', NA)
-        print('W\n', W)
-        print('nzero_ind\n', nzero_ind)
-        print(nzero_ind[0].shape[0])
+        # print(nzero_ind[0])
+        # print(nzero_ind[1])
+        # print(type(nzero_ind[0]))
+        # print('U\n', U)
+        # print('G\n', G)
+        # print('NA\n', NA)
+        # print('W\n', W)
+        # print('nzero_ind\n', nzero_ind)
+        # print(nzero_ind[0].shape[0])
 
-        return None
+        W = W + W.T
+
+        # print(type(W))
+        # print(W)
+        
+        return W
 
     def SpectralPartitioning(self, A):
         """
@@ -510,5 +536,4 @@ def main():
     # print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\nncondc\n', condc, '\n\norder\n', order)
 
 if __name__ == '__main__':
-
     main()
