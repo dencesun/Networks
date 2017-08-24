@@ -492,6 +492,23 @@ class HigerOrderNetwork(object):
         pass
 
 
+def create_network(data):
+    DG = nx.DiGraph()
+    with open(data, 'r') as f:
+        line = f.readline()
+        while line[0] == '#':
+            print(line)
+            line = f.readline()
+
+        while line:
+            edge = line.split()
+            # print(int(edge[0]), (edge[1]))
+            DG.add_edge(int(edge[0]), int(edge[1]))
+            line = f.readline()
+        f.close()
+    return DG
+
+
 def main():
     """
     graph data g come from Jure Leskovec(2016) Higher-order organization of complex networks Fig 1
@@ -499,30 +516,35 @@ def main():
     :return: None
 
     """
-    g = nx.DiGraph()
-    g.add_edge(1, 2)
-    g.add_edge(1, 3)
-    g.add_edge(1, 4)
-    g.add_edge(1, 5)
-    g.add_edge(1, 6)
-    g.add_edge(2, 1)
-    g.add_edge(2, 3)
-    g.add_edge(2, 4)
-    g.add_edge(2, 5)
-    g.add_edge(6, 2)
-    g.add_edge(6, 7)
-    g.add_edge(7, 2)
-    g.add_edge(7, 6)
-    g.add_edge(8, 2)
-    g.add_edge(8, 6)
-    g.add_edge(8, 9)
-    g.add_edge(8, 10)
-    g.add_edge(9, 6)
-    g.add_edge(9, 7)
-    g.add_edge(9, 8)
-    g.add_edge(9, 10)
 
-    test = HigerOrderNetwork(g)
+    data = '/home/sun/PycharmProjects/Network/C-elegans-frontal.txt'
+    # data = 'www.adj'
+    DG = create_network(data)
+
+    # g = nx.DiGraph()
+    # g.add_edge(1, 2)
+    # g.add_edge(1, 3)
+    # g.add_edge(1, 4)
+    # g.add_edge(1, 5)
+    # g.add_edge(1, 6)
+    # g.add_edge(2, 1)
+    # g.add_edge(2, 3)
+    # g.add_edge(2, 4)
+    # g.add_edge(2, 5)
+    # g.add_edge(6, 2)
+    # g.add_edge(6, 7)
+    # g.add_edge(7, 2)
+    # g.add_edge(7, 6)
+    # g.add_edge(8, 2)
+    # g.add_edge(8, 6)
+    # g.add_edge(8, 9)
+    # g.add_edge(8, 10)
+    # g.add_edge(9, 6)
+    # g.add_edge(9, 7)
+    # g.add_edge(9, 8)
+    # g.add_edge(9, 10)
+
+    test = HigerOrderNetwork(DG)
     W = test.MotifAdjacency('bifan')
 
     # print('W\n', W)
@@ -531,8 +553,8 @@ def main():
 
     # test.DirectionalBreakup(W)
     # test.nfiedler(W)
-    # cluster, condv, condc, order = test.SpectralPartitioning(W)
-    # print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\nncondc\n', condc, '\n\norder\n', order)
+    cluster, condv, condc, order = test.SpectralPartitioning(W)
+    print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\nncondc\n', condc, '\n\norder\n', order)
 
 if __name__ == '__main__':
     main()
