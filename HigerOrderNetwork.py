@@ -10,7 +10,6 @@
 
 """
 
-
 import networkx as nx
 import numpy as np
 from scipy import linalg as SLA
@@ -262,12 +261,12 @@ class HigerOrderNetwork(object):
                     w = common[i]
                     v = common[j]
                     if NA[w, v] == 1:
-                        W[x, y] = W[x, y] + 1;
-                        W[x, w] = W[x, w] + 1;
-                        W[x, v] = W[x, v] + 1;
-                        W[y, w] = W[y, w] + 1;
-                        W[y, v] = W[y, v] + 1;
-                        W[w, v] = W[w, v] + 1;
+                        W[x, y] = W[x, y] + 1
+                        W[x, w] = W[x, w] + 1
+                        W[x, v] = W[x, v] + 1
+                        W[y, w] = W[y, w] + 1
+                        W[y, v] = W[y, v] + 1
+                        W[w, v] = W[w, v] + 1
 
         # print(nzero_ind[0])
         # print(nzero_ind[1])
