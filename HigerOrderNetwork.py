@@ -305,7 +305,7 @@ class HigerOrderNetwork(object):
 
         # order = np.array([9,7,8, 5,6, 1, 4, 0, 3, 2])
         # order = np.mat(order)
-        # print('\norder\n', order)
+        # print('\norder.shape\n', order.shape)
         # print(A)
 
         n = order.shape[1]
@@ -315,8 +315,10 @@ class HigerOrderNetwork(object):
         for i in range(len(crtesianProduct)):
             # print(int(i/10), i%10)
             # print(crtesianProduct[i][0], crtesianProduct[i][1])
-            B[int(i/10), i%10] = A[crtesianProduct[i][0], crtesianProduct[i][1]]
+            # B[int(i/10), i%10] = A[crtesianProduct[i][0], crtesianProduct[i][1]]
+            B[int(i/n), i%n] = A[crtesianProduct[i][0], crtesianProduct[i][1]]
         # print('B\n', B)
+
         B_lower = np.tril(B)
         # print('B_lower\n', B_lower)
         B_sums = np.mat(B.sum(axis = 1)).T
@@ -360,10 +362,10 @@ class HigerOrderNetwork(object):
 
         # print(condv)
         # 画图验证正确性
-        x = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-        plt.plot(x, scores[:, 0])
-        # plt.show()
-        plt.savefig('demo.svg')
+        # x = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        # plt.plot(x, scores[:, 0])
+        # # plt.show()
+        # plt.savefig('demo.svg')
 
         return cluster, condv, condc, order
 
@@ -517,10 +519,6 @@ def main():
 
     """
 
-    data = '/home/sun/PycharmProjects/Network/C-elegans-frontal.txt'
-    # data = 'www.adj'
-    DG = create_network(data)
-
     # g = nx.DiGraph()
     # g.add_edge(1, 2)
     # g.add_edge(1, 3)
@@ -543,18 +541,31 @@ def main():
     # g.add_edge(9, 7)
     # g.add_edge(9, 8)
     # g.add_edge(9, 10)
+    #
+    # test = HigerOrderNetwork(g)
+    # W = test.MotifAdjacency('m7')
+
+
+    data = '/home/sun/PycharmProjects/Network/C-elegans-frontal.txt'
+    DG = create_network(data)
 
     test = HigerOrderNetwork(DG)
     W = test.MotifAdjacency('bifan')
+    x = nx.from_numpy_matrix(W)
 
+    largest_cc = max(nx.connected_component_subgraphs(x), key = len)
+    W = nx.to_numpy_matrix(largest_cc)
+    print(W.shape)
+    print(W[110, 111])
+    # print(largest_cc)
+    print('nx.is_connected(x)\n', nx.is_connected(largest_cc))
     # print('W\n', W)
     # print(type(W))
-
-
+    # print(W.shape)
     # test.DirectionalBreakup(W)
     # test.nfiedler(W)
     cluster, condv, condc, order = test.SpectralPartitioning(W)
-    print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\nncondc\n', condc, '\n\norder\n', order)
+    print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\ncondc\n', condc, '\n\norder\n', order)
 
 if __name__ == '__main__':
     main()
