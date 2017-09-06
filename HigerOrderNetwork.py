@@ -507,7 +507,19 @@ class HigerOrderNetwork(object):
                 sizes: the sizes of the connected components
 
         """
-        pass
+        x, y = connected_components(A)
+        mask = list()
+
+        for i in range(y.shape[0]):
+            if y[i] != 0:
+                A[i, :] = 0
+                A[:, i] = 0
+                mask.append(i)
+
+        A = np.delete(A, mask, 0)
+        A = np.delete(A, mask, 1)
+
+        return A
 
 
 def create_network(data):
@@ -566,27 +578,16 @@ def main():
     DG = create_network(data)
     test = HigerOrderNetwork(DG)
     W = test.MotifAdjacency('bifan')
-    x, y = connected_components(W)
-    mask = list()
-
-    for i in range(y.shape[0]):
-        if y[i] != 0:
-            W[i, :] = 0
-            W[:, i] = 0
-            mask.append(i)
-
-    W = np.delete(W, mask, 0)
-    W = np.delete(W, mask, 1)
+    W = test.LargestConnectComponent(W)
     print('W.shape', W.shape)
-    print('y.shape', y.shape)
-    print(W.shape)
-    print('test x\n', x)
-    print('test y\n', y)
+    # print('y.shape', y.shape)
+    # print('test x\n', x)
+    # print('test y\n', y)
     # save as matlab file format
     # savemat('W.mat', {'W': W})
     cluster, condv, condc, order = test.SpectralPartitioning(W)
-    print('condc\n', condc, '\ncondv\n', condv)
-    print('cluster\n', cluster)
+    print('condc: ', condc)
+    print('cluster:',  cluster)
 
 if __name__ == '__main__':
     main()
