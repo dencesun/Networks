@@ -16,6 +16,8 @@ from scipy import linalg as SLA
 from numpy import linalg as NLA
 import math
 import matplotlib.pyplot as plt
+from scipy.io import savemat
+from scipy.sparse.csgraph import connected_components
 
 np.seterr(divide='ignore', invalid='ignore')
 
@@ -34,6 +36,7 @@ class HigerOrderNetwork(object):
 
         """
         A = self.graph
+        # print('A\n', A)
         # print(type(A))
         # ignore diagonals and weights
         A = A - np.diag(np.diag(A))
@@ -241,20 +244,33 @@ class HigerOrderNetwork(object):
     # 未完成
     def Bifan(self, A):
         B, U, G = self.DirectionalBreakup(A)
-        NA = np.logical_and((A==0)*1, (A.T == 0)*1)*1
+        tmp = A.T
+        NA = np.logical_and((A==0)*1, (tmp == 0)*1)*1
 
+        # print('bifan U\n', U)
+        # print('bifan G\n', G)
+        # print('NA\n', NA)
         W = np.zeros(G.shape)
         W = np.mat(W)
+        # print('bifan W\n', W)
+        # print('bifan triu(NA, 1)\n', np.triu(NA, 1))
         nzero_ind = np.nonzero(np.triu(NA, 1))
+        # print('bifan nzero_ind\n', nzero_ind[1].shape)
 
         for ind in range(nzero_ind[0].shape[0]):
             x = nzero_ind[0][ind]
             y = nzero_ind[1][ind]
+            # print(x, y)
             xout = np.nonzero(U[x, :])
             yout = np.nonzero(U[y, :])
-            common = np.intersect1d(xout, yout)
-            # print(common)
-            nc = common.shape[0]
+            # print('bifan np.nonzero(U[x, :])\n', np.nonzero(U[x, :]))
+            # print('bifan np.nonzero(U[y, :])\n', np.nonzero(U[y, :]))
+            # print('bifan xout\n', xout)
+            # print('bifan yout\n', yout)
+            common = np.intersect1d(xout[1], yout[1])
+            # print('conmon\n',common)
+            nc = len(common)
+            # print('bifan nc', nc)
             # print(common[0, 0])
             for i in range(nc):
                 for j in range(i+1, nc):
@@ -541,31 +557,36 @@ def main():
     # g.add_edge(9, 7)
     # g.add_edge(9, 8)
     # g.add_edge(9, 10)
-    #
+    # #
     # test = HigerOrderNetwork(g)
-    # W = test.MotifAdjacency('m7')
+    # W = test.MotifAdjacency('bifan')
 
 
     data = '/home/sun/PycharmProjects/Network/C-elegans-frontal.txt'
     DG = create_network(data)
-
     test = HigerOrderNetwork(DG)
     W = test.MotifAdjacency('bifan')
-    x = nx.from_numpy_matrix(W)
+    x, y = connected_components(W)
+    mask = list()
 
-    largest_cc = max(nx.connected_component_subgraphs(x), key = len)
-    W = nx.to_numpy_matrix(largest_cc)
+    for i in range(y.shape[0]):
+        if y[i] != 0:
+            W[i, :] = 0
+            W[:, i] = 0
+            mask.append(i)
+
+    W = np.delete(W, mask, 0)
+    W = np.delete(W, mask, 1)
+    print('W.shape', W.shape)
+    print('y.shape', y.shape)
     print(W.shape)
-    print(W[110, 111])
-    # print(largest_cc)
-    print('nx.is_connected(x)\n', nx.is_connected(largest_cc))
-    # print('W\n', W)
-    # print(type(W))
-    # print(W.shape)
-    # test.DirectionalBreakup(W)
-    # test.nfiedler(W)
+    print('test x\n', x)
+    print('test y\n', y)
+    # save as matlab file format
+    # savemat('W.mat', {'W': W})
     cluster, condv, condc, order = test.SpectralPartitioning(W)
-    print('cluster\n', cluster,'\n\ncondv\n', condv.T, '\n\ncondc\n', condc, '\n\norder\n', order)
+    print('condc\n', condc, '\ncondv\n', condv)
+    print('cluster\n', cluster)
 
 if __name__ == '__main__':
     main()
