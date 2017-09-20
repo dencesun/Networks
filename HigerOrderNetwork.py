@@ -12,14 +12,17 @@
 
 import networkx as nx
 import numpy as np
+import math
+from time import time
+from scipy.sparse.csgraph import connected_components
 from scipy import linalg as SLA
 from numpy import linalg as NLA
-import math
 import matplotlib.pyplot as plt
 from scipy.io import savemat
-from scipy.sparse.csgraph import connected_components
+
 
 np.seterr(divide='ignore', invalid='ignore')
+
 
 class HigerOrderNetwork(object):
     def __init__(self, graph):
@@ -539,6 +542,162 @@ def create_network(data):
     return DG
 
 
+def motif_m7(g):
+    n = nx.number_of_nodes(g)
+    W = np.zeros((n, n), dtype=float)
+    W = np.mat(W)
+
+    # nei = set(nx.all_neighbors(g, 2))
+    # print('all_neighbors: ', nei)
+    for u in range(0, n):
+        u_neighbors = set(nx.all_neighbors(g, u))
+        # sorted(u_neighbors)
+        # print(u, u_neighbors)
+        for v in u_neighbors:
+            if v < u:
+                continue
+            v_neighbors = set(nx.all_neighbors(g, v))
+            # sorted(v_neighbors)
+            for w in v_neighbors:
+                if w < u or w < v:
+                    continue
+                if g.has_edge(u, v) and g.has_edge(v, u) and g.has_edge(u, w) and g.has_edge(v, w):
+                    W[u-1, w-1] = W[u-1, w-1] + 1
+                    W[w-1, u-1] = W[w-1, u-1] + 1
+                    W[u-1, v-1] = W[u-1, v-1] + 1
+                    W[v-1, u-1] = W[v-1, u-1] + 1
+                    W[v-1, w-1] = W[v-1, w-1] + 1
+                    W[w-1, v-1] = W[w-1, v-1] + 1
+                    continue
+                if g.has_edge(u, w) and g.has_edge(w, u) and g.has_edge(u, v) and g.has_edge(w, v):
+                    W[u-1, w-1] = W[u-1, w-1] + 1
+                    W[w-1, u-1] = W[w-1, u-1] + 1
+                    W[u-1, v-1] = W[u-1, v-1] + 1
+                    W[v-1, u-1] = W[v-1, u-1] + 1
+                    W[v-1, w-1] = W[v-1, w-1] + 1
+                    W[w-1, v-1] = W[w-1, v-1] + 1
+                    continue
+                if g.has_edge(v, w) and g.has_edge(w, v) and g.has_edge(w, u) and g.has_edge(v, u):
+                    W[u-1, w-1] = W[u-1, w-1] + 1
+                    W[w-1, u-1] = W[w-1, u-1] + 1
+                    W[u-1, v-1] = W[u-1, v-1] + 1
+                    W[v-1, u-1] = W[v-1, u-1] + 1
+                    W[v-1, w-1] = W[v-1, w-1] + 1
+                    W[w-1, v-1] = W[w-1, v-1] + 1
+                    continue
+    print(W)
+    print(type(W))
+
+    return W
+
+
+def motif_bifan(g):
+    n = nx.number_of_nodes(g)
+    W = np.zeros((n, n), dtype=float)
+    W = np.mat(W)
+    print(W.shape)
+    for u in range(0, n):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_neighbors.sort()
+        # print(u_neighbors)
+        print(u, u_neighbors)
+        for v in u_neighbors:
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_neighbors.sort()
+            for w in v_neighbors:
+                if w < u or w < v:
+                    continue
+                w_neighbors = list(set(nx.all_neighbors(g, w)))
+                w_neighbors.sort()
+                for z in w_neighbors:
+                    if z < u or z < v or z < w:
+                        continue
+                    # print(u, v, w, z)
+                    if g.has_edge(u, w) and g.has_edge(u, z) and g.has_edge(v, w) and g.has_edge(v, z):
+                        W[u, w] = W[u, w] + 1
+                        W[w, u] = W[w, u] + 1
+                        W[u, z] = W[u, z] + 1
+                        W[z, u] = W[z, u] + 1
+                        W[v, w] = W[v, w] + 1
+                        W[w, v] = W[w, v] + 1
+                        W[v, z] = W[v, z] + 1
+                        W[z, v] = W[z, v] + 1
+                        W[u, v] = W[u, v] + 1
+                        W[v, u] = W[v, u] + 1
+                        W[w, z] = W[w, z] + 1
+                        W[z, w] = W[z, w] + 1
+
+                    elif g.has_edge(u, v) and g.has_edge(u, z) and g.has_edge(w, v) and g.has_edge(w, z):
+                        W[u, w] = W[u, w] + 1
+                        W[w, u] = W[w, u] + 1
+                        W[u, z] = W[u, z] + 1
+                        W[z, u] = W[z, u] + 1
+                        W[v, w] = W[v, w] + 1
+                        W[w, v] = W[w, v] + 1
+                        W[v, z] = W[v, z] + 1
+                        W[z, v] = W[z, v] + 1
+                        W[u, v] = W[u, v] + 1
+                        W[v, u] = W[v, u] + 1
+                        W[w, z] = W[w, z] + 1
+                        W[z, w] = W[z, w] + 1
+                    elif g.has_edge(u, v) and g.has_edge(u, w) and g.has_edge(z, v) and g.has_edge(z, w):
+                        W[u, w] = W[u, w] + 1
+                        W[w, u] = W[w, u] + 1
+                        W[u, z] = W[u, z] + 1
+                        W[z, u] = W[z, u] + 1
+                        W[v, w] = W[v, w] + 1
+                        W[w, v] = W[w, v] + 1
+                        W[v, z] = W[v, z] + 1
+                        W[z, v] = W[z, v] + 1
+                        W[u, v] = W[u, v] + 1
+                        W[v, u] = W[v, u] + 1
+                        W[w, z] = W[w, z] + 1
+                        W[z, w] = W[z, w] + 1
+                    elif g.has_edge(v, u) and g.has_edge(v, w) and g.has_edge(z, u) and g.has_edge(z, w):
+                        W[u, w] = W[u, w] + 1
+                        W[w, u] = W[w, u] + 1
+                        W[u, z] = W[u, z] + 1
+                        W[z, u] = W[z, u] + 1
+                        W[v, w] = W[v, w] + 1
+                        W[w, v] = W[w, v] + 1
+                        W[v, z] = W[v, z] + 1
+                        W[z, v] = W[z, v] + 1
+                        W[u, v] = W[u, v] + 1
+                        W[v, u] = W[v, u] + 1
+                        W[w, z] = W[w, z] + 1
+                        W[z, w] = W[z, w] + 1
+                    elif g.has_edge(v, u) and g.has_edge(v, z) and g.has_edge(w, u) and g.has_edge(w, z):
+                        W[u, w] = W[u, w] + 1
+                        W[w, u] = W[w, u] + 1
+                        W[u, z] = W[u, z] + 1
+                        W[z, u] = W[z, u] + 1
+                        W[v, w] = W[v, w] + 1
+                        W[w, v] = W[w, v] + 1
+                        W[v, z] = W[v, z] + 1
+                        W[z, v] = W[z, v] + 1
+                        W[u, v] = W[u, v] + 1
+                        W[v, u] = W[v, u] + 1
+                        W[w, z] = W[w, z] + 1
+                        W[z, w] = W[z, w] + 1
+                    elif g.has_edge(w, u) and g.has_edge(w, v) and g.has_edge(z, u) and g.has_edge(z, v):
+                        W[u, w] = W[u, w] + 1
+                        W[w, u] = W[w, u] + 1
+                        W[u, z] = W[u, z] + 1
+                        W[z, u] = W[z, u] + 1
+                        W[v, w] = W[v, w] + 1
+                        W[w, v] = W[w, v] + 1
+                        W[v, z] = W[v, z] + 1
+                        W[z, v] = W[z, v] + 1
+                        W[u, v] = W[u, v] + 1
+                        W[v, u] = W[v, u] + 1
+                        W[w, z] = W[w, z] + 1
+                        W[z, w] = W[z, w] + 1
+
+    return W
+
+
 def main():
     """
     graph data g come from Jure Leskovec(2016) Higher-order organization of complex networks Fig 1
@@ -569,25 +728,46 @@ def main():
     # g.add_edge(9, 7)
     # g.add_edge(9, 8)
     # g.add_edge(9, 10)
-    # #
+    #
+    # W = motif_m7(g)
     # test = HigerOrderNetwork(g)
-    # W = test.MotifAdjacency('bifan')
+    # cluster, condv, condc, order = test.SpectralPartitioning(W)
+    # print('condc: ', condc)
+    # W = test.MotifAdjacency('m7')
+    # print(W)
+    # print(type(W))
 
-
-    data = '/home/sun/PycharmProjects/Network/C-elegans-frontal.txt'
+    data = 'D:\PyCharm\\Networks\C-elegans-frontal.txt'
     DG = create_network(data)
     test = HigerOrderNetwork(DG)
+    X = motif_bifan(DG)
     W = test.MotifAdjacency('bifan')
-    W = test.LargestConnectComponent(W)
-    print('W.shape', W.shape)
-    # print('y.shape', y.shape)
-    # print('test x\n', x)
-    # print('test y\n', y)
-    # save as matlab file format
-    # savemat('W.mat', {'W': W})
-    cluster, condv, condc, order = test.SpectralPartitioning(W)
+    print((X==W).all())
+    X = test.LargestConnectComponent(X)
+    print('W.shape', X.shape)
+
+
+    cluster, condv, condc, order = test.SpectralPartitioning(X)
     print('condc: ', condc)
-    print('cluster:',  cluster)
+
+    # data = 'C-elegans-frontal.txt'
+    # DG = create_network(data)
+    # test = HigerOrderNetwork(DG)
+    # W = test.MotifAdjacency('bifan')
+    # W = test.LargestConnectComponent(W)
+    # print('W.shape', W.shape)
+    # # print('y.shape', y.shape)
+    # # print('test x\n', x)
+    # # print('test y\n', y)
+    # # save as matlab file format
+    # # savemat('W.mat', {'W': W})
+    # cluster, condv, condc, order = test.SpectralPartitioning(W)
+    # print('condc: ', condc)
+    # print('cluster:',  cluster)
+
 
 if __name__ == '__main__':
+    start = time()
     main()
+    end = time()
+    print('runtime = ', str(end-start) + 's')
