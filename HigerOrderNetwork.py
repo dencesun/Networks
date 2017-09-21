@@ -596,128 +596,78 @@ def motif_bifan(g):
     W = np.zeros((n, n), dtype=float)
     W = np.mat(W)
     print(W.shape)
+    motif = list()
+
     for u in range(0, n):
         u_neighbors = list(set(nx.all_neighbors(g, u)))
         u_neighbors.sort()
-        # print(u_neighbors)
-        # print(u, u_neighbors)
-        for v in u_neighbors:
-            if v < u:
-                continue
-            v_neighbors = list(set(nx.all_neighbors(g, v)))
-            v_neighbors.sort()
-            for w in v_neighbors:
-                if w < u or w < v:
-                    continue
-                w_neighbors = list(set(nx.all_neighbors(g, w)))
-                w_neighbors.sort()
-                for z in w_neighbors:
-                    if z < u or z < v or z < w:
-                        continue
-                    # print(u, v, w, z)
-                    if g.has_edge(u, w) and g.has_edge(u, z) and g.has_edge(v, w) and g.has_edge(v, z):
-                        if (not g.has_edge(w,u)) and (not g.has_edge(z, u)) and (not g.has_edge(w, v)) and (not g.has_edge(z, v))\
-                            and (not g.has_edge(w,z)) and (not g.has_edge(z, w))\
-                            and (not g.has_edge(u, v)) and (g.has_edge(v, u)):
-                            W[u, w] = W[u, w] + 1
-                            W[w, u] = W[w, u] + 1
-                            W[u, z] = W[u, z] + 1
-                            W[z, u] = W[z, u] + 1
-                            W[v, w] = W[v, w] + 1
-                            W[w, v] = W[w, v] + 1
-                            W[v, z] = W[v, z] + 1
-                            W[z, v] = W[z, v] + 1
-                            W[u, v] = W[u, v] + 1
-                            W[v, u] = W[v, u] + 1
-                            W[w, z] = W[w, z] + 1
-                            W[z, w] = W[z, w] + 1
+        u_len = len(u_neighbors)
+        for i in range(0, u_len):
+            v = u_neighbors[i]
+            # if v < u:
+            #     continue
+            for j in range(i+1, u_len):
+                w = u_neighbors[j]
+                # if w < u or w < v:
+                #     continue
+                if g.has_edge(u, v) and g.has_edge(u, w) and (not g.has_edge(v, u)) and (not g.has_edge(w, u)) and (not g.has_edge(v, w)) and (not g.has_edge(w, v)):
+                    for z in range(0, n):
+                        if z == u:
                             continue
-                    elif g.has_edge(u, v) and g.has_edge(u, z) and g.has_edge(w, v) and g.has_edge(w, z):
-                        if (not g.has_edge(v, u)) and (not g.has_edge(z, u)) and (not g.has_edge(v, w)) and (not g.has_edge(z, w))\
-                            and (not g.has_edge(u, w)) and (not g.has_edge(w, u))\
-                            and (not g.has_edge(z, v)) and (not g.has_edge(v,z)):
-                            W[u, w] = W[u, w] + 1
-                            W[w, u] = W[w, u] + 1
-                            W[u, z] = W[u, z] + 1
-                            W[z, u] = W[z, u] + 1
-                            W[v, w] = W[v, w] + 1
-                            W[w, v] = W[w, v] + 1
-                            W[v, z] = W[v, z] + 1
-                            W[z, v] = W[z, v] + 1
-                            W[u, v] = W[u, v] + 1
-                            W[v, u] = W[v, u] + 1
-                            W[w, z] = W[w, z] + 1
-                            W[z, w] = W[z, w] + 1
+                        if g.has_edge(z, v) and g.has_edge(z, w) and (not g.has_edge(v, z)) and (not g.has_edge(w, z)) and (not g.has_edge(u, z)) and (not g.has_edge(z, u)):
+                            if sorted([u, v, w, z]) not in motif:
+                                W[u, w] = W[u, w] + 1
+                                W[w, u] = W[w, u] + 1
+                                W[u, z] = W[u, z] + 1
+                                W[z, u] = W[z, u] + 1
+                                W[v, w] = W[v, w] + 1
+                                W[w, v] = W[w, v] + 1
+                                W[v, z] = W[v, z] + 1
+                                W[z, v] = W[z, v] + 1
+                                W[u, v] = W[u, v] + 1
+                                W[v, u] = W[v, u] + 1
+                                W[w, z] = W[w, z] + 1
+                                W[z, w] = W[z, w] + 1
+                                motif.append(sorted([u, v, w, z]))
+                elif g.has_edge(v, u) and g.has_edge(v, w) and (not g.has_edge(u, v)) and (not g.has_edge(w, v)) and (not g.has_edge(u, w)) and (not g.has_edge(w, u)):
+                    for z in range(0, n):
+                        if z == v:
                             continue
-                    elif g.has_edge(u, v) and g.has_edge(u, w) and g.has_edge(z, v) and g.has_edge(z, w):
-                        if (not g.has_edge(v, u)) and (not g.has_edge(w, u)) and (not g.has_edge(v, z)) and (not g.has_edge(w, z))\
-                            and (not g.has_edge(u, z)) and (not g.has_edge(z, u))\
-                            and (not g.has_edge(v, w)) and (not g.has_edge(w, v)):
-                            W[u, w] = W[u, w] + 1
-                            W[w, u] = W[w, u] + 1
-                            W[u, z] = W[u, z] + 1
-                            W[z, u] = W[z, u] + 1
-                            W[v, w] = W[v, w] + 1
-                            W[w, v] = W[w, v] + 1
-                            W[v, z] = W[v, z] + 1
-                            W[z, v] = W[z, v] + 1
-                            W[u, v] = W[u, v] + 1
-                            W[v, u] = W[v, u] + 1
-                            W[w, z] = W[w, z] + 1
-                            W[z, w] = W[z, w] + 1
+                        if g.has_edge(z, u) and g.has_edge(z, w) and (not g.has_edge(u, z)) and (not g.has_edge(w, z)) and (not g.has_edge(z, v)) and (not g.has_edge(v, z)):
+                            if sorted([u, v, w, z]) not in motif:
+                                W[u, w] = W[u, w] + 1
+                                W[w, u] = W[w, u] + 1
+                                W[u, z] = W[u, z] + 1
+                                W[z, u] = W[z, u] + 1
+                                W[v, w] = W[v, w] + 1
+                                W[w, v] = W[w, v] + 1
+                                W[v, z] = W[v, z] + 1
+                                W[z, v] = W[z, v] + 1
+                                W[u, v] = W[u, v] + 1
+                                W[v, u] = W[v, u] + 1
+                                W[w, z] = W[w, z] + 1
+                                W[z, w] = W[z, w] + 1
+                                motif.append(sorted([u, v, w, z]))
+                elif g.has_edge(w, u) and g.has_edge(w, v) and (not g.has_edge(u, w)) and (not g.has_edge(v, w)) and (not g.has_edge(u, v)) and (not g.has_edge(v, u)):
+                    for z in range(0, n):
+                        if z == w:
                             continue
-                    elif g.has_edge(v, u) and g.has_edge(v, w) and g.has_edge(z, u) and g.has_edge(z, w):
-                        if (not g.has_edge(u, v)) and (not g.has_edge(w, v)) and (not g.has_edge(u, z)) and (not g.has_edge(w, z))\
-                            and (not g.has_edge(v, z)) and (not g.has_edge(z, v))\
-                            and (not g.has_edge(u, w)) and (not g.has_edge(w, u)):
-                            W[u, w] = W[u, w] + 1
-                            W[w, u] = W[w, u] + 1
-                            W[u, z] = W[u, z] + 1
-                            W[z, u] = W[z, u] + 1
-                            W[v, w] = W[v, w] + 1
-                            W[w, v] = W[w, v] + 1
-                            W[v, z] = W[v, z] + 1
-                            W[z, v] = W[z, v] + 1
-                            W[u, v] = W[u, v] + 1
-                            W[v, u] = W[v, u] + 1
-                            W[w, z] = W[w, z] + 1
-                            W[z, w] = W[z, w] + 1
-                            continue
-                    elif g.has_edge(v, u) and g.has_edge(v, z) and g.has_edge(w, u) and g.has_edge(w, z):
-                        if (not g.has_edge(u, v)) and (not g.has_edge(z, v)) and (not g.has_edge(u, w)) and (not g.has_edge(z, w))\
-                            and (not g.has_edge(v, w)) and (not g.has_edge(w, v))\
-                            and (not g.has_edge(u, z)) and (not g.has_edge(z, u)):
-                            W[u, w] = W[u, w] + 1
-                            W[w, u] = W[w, u] + 1
-                            W[u, z] = W[u, z] + 1
-                            W[z, u] = W[z, u] + 1
-                            W[v, w] = W[v, w] + 1
-                            W[w, v] = W[w, v] + 1
-                            W[v, z] = W[v, z] + 1
-                            W[z, v] = W[z, v] + 1
-                            W[u, v] = W[u, v] + 1
-                            W[v, u] = W[v, u] + 1
-                            W[w, z] = W[w, z] + 1
-                            W[z, w] = W[z, w] + 1
-                        continue
+                        if g.has_edge(z, u) and g.has_edge(z, v) and (not g.has_edge(u, z)) and (not g.has_edge(v, z)) and (not g.has_edge(z, w)) and (not g.has_edge(w, z)):
+                            if sorted([u, v, w, z]) not in motif:
+                                W[u, w] = W[u, w] + 1
+                                W[w, u] = W[w, u] + 1
+                                W[u, z] = W[u, z] + 1
+                                W[z, u] = W[z, u] + 1
+                                W[v, w] = W[v, w] + 1
+                                W[w, v] = W[w, v] + 1
+                                W[v, z] = W[v, z] + 1
+                                W[z, v] = W[z, v] + 1
+                                W[u, v] = W[u, v] + 1
+                                W[v, u] = W[v, u] + 1
+                                W[w, z] = W[w, z] + 1
+                                W[z, w] = W[z, w] + 1
+                                motif.append(sorted([u, v, w, z]))
 
-                    elif g.has_edge(w, u) and g.has_edge(w, v) and g.has_edge(z, u) and g.has_edge(z, v):
-                        if (not g.has_edge(u, w)) and (not g.has_edge(v, w)) and (not g.has_edge(u, z)) and (not g.has_edge(v, z))\
-                            and (not g.has_edge(w, z)) and (not g.has_edge(z, w))\
-                            and (not g.has_edge(u, v)) and (not g.has_edge(v, u)):
-                            W[u, w] = W[u, w] + 1
-                            W[w, u] = W[w, u] + 1
-                            W[u, z] = W[u, z] + 1
-                            W[z, u] = W[z, u] + 1
-                            W[v, w] = W[v, w] + 1
-                            W[w, v] = W[w, v] + 1
-                            W[v, z] = W[v, z] + 1
-                            W[z, v] = W[z, v] + 1
-                            W[u, v] = W[u, v] + 1
-                            W[v, u] = W[v, u] + 1
-                            W[w, z] = W[w, z] + 1
-                            W[z, w] = W[z, w] + 1
-                            continue
 
     return W
 
