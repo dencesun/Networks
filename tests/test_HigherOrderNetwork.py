@@ -36,9 +36,9 @@ def paper_figure1():
 
     W = HigherOrderNetwork.motif_m7(g)
     cluster, condv, condc, order = HigherOrderNetwork.spectral_partitioning(W)
-    print("paper figure1's result\n")
+    print("\n\npaper figure1's result")
     print('condc: ', condc)
-    print('cluser: ', cluster)
+    print('cluster\n', cluster)
 
 
 def paper_figure2():
@@ -48,20 +48,26 @@ def paper_figure2():
     :return: None
 
     """
-
-    data = '/Users/dencesun/Desktop/Networks/data/C-elegans-frontal.txt'
+    # path for mac
+    # data = '/Users/dencesun/Desktop/Networks/data/C-elegans-frontal.txt'
+    # path for linux
+    data = '/home/sun/Desktop/Networks-master/data/C-elegans-frontal.txt'
+    # data = '../data/C-elegans-frontal.txt'
     DG = HigherOrderNetwork.create_network(data)
     A = HigherOrderNetwork.create_adjacency(DG)
     W = HigherOrderNetwork.motif_bifan(DG)
     W = HigherOrderNetwork.largest_connect_component(W)
     cluster, condv, condc, order = HigherOrderNetwork.spectral_partitioning(W)
 
+    print("\n\npaper_figure2's result")
     print("largest_connect_component's shape: ", W.shape)
     print("C-elegans's result")
     print('condc: ', condc)
-
+    print('cluster\n', cluster)
     # save as matlab file format
-    savemat('/Users/dencesun/Desktop/Networks/data/c-elegans.mat', {'W': W})
+    # savemat('/Users/dencesun/Desktop/Networks/data/c-elegans.mat', {'W': W})
+    # save path for linux
+    savemat('/home/sun/Desktop/Networks-master/data/c-elegans.mat', {'W': W})
     print('complete save motif adjacency matrix in data')
 
 

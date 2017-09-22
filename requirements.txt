@@ -1,4 +1,3 @@
-# requirements.txt 记录当前程序的所有依赖包以及精确版本号，其作用是用来在另一台PC上重新构建项目所需要的运行环境依赖
 scipy
 numpy
 networkx
