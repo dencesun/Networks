@@ -18,8 +18,24 @@ from scipy import linalg as SLA
 from numpy import linalg as NLA
 import matplotlib.pyplot as plt
 
-
 np.seterr(divide='ignore', invalid='ignore')
+
+
+def create_network(data):
+    DG = nx.DiGraph()
+    f = open(data, 'r')
+    line = f.readline()
+    while line[0] == '#':
+        # print(line)
+        line = f.readline()
+
+    while line:
+        edge = line.split()
+        # print(int(edge[0]), (edge[1]))
+        DG.add_edge(int(edge[0]), int(edge[1]))
+        line = f.readline()
+    f.close()
+    return DG
 
 
 def create_adjacency(graph):
@@ -115,218 +131,6 @@ def directional_breakup(A):
     U = A - B
     G = np.logical_or(A, A.T) * 1
     return B, U, G
-
-
-def m1_motif(A):
-    B, U, G = directional_breakup(A)
-    W = np.multiply(U * U, U)
-    return W
-
-
-def m2_motif(A):
-    B, U, G = directional_breakup(A)
-    C = np.multiply(B * U, U.T) + np.multiply(U * B, U.T) + np.multiply(U * U, B)
-    W = C + C.T
-    return W
-
-
-def m3_motif(A):
-    B, U, G = directional_breakup(A)
-    C = np.multiply(B * B, U) + np.multiply(B * U, B) + np.multiply(U * B, B)
-    W = C + C.T
-    return W
-
-
-def m4_motif(A):
-    B, U, G = directional_breakup(A)
-    W = np.multiply(B * B, B)
-    return W
-
-
-def m5_motif(A):
-    B, U, G = directional_breakup(A)
-    T1 = np.multiply(U * U, U)
-    T2 = np.multiply((U.T) * U, U)
-    T3 = np.multiply(U * (U.T), U)
-    C = T1 + T2 + T3
-    W = C + C.T
-    return W
-
-
-def m6_motif(A):
-    B, U, G = directional_breakup(A)
-    C1 = np.multiply(U * B, U)
-    C1 = C1 + C1.T
-    C2 = np.multiply((U.T) * U, B)
-    W = C1 + C2
-    return W
-
-
-def m7_motif(A):
-    B, U, G = directional_breakup(A)
-    C1 = np.multiply((U.T) * B, U.T)
-    C1 = C1 + C1.T
-    C2 = np.multiply(U * (U.T), B)
-    W = C1 + C2
-    return W
-
-
-def m8_motif(A):
-    B, U, G = directional_breakup(A)
-    W = np.zeros(G.shape)
-    W = np.asmatrix(W)
-    N = G.shape[0]
-    # print('U\n', U)
-    for i in range(N):
-        J = np.nonzero(U[i, :])[1]
-        # print(J)
-        for j1 in range(len(J)):
-            for j2 in range(j1 + 1, len(J)):
-                k1 = J[j1]
-                k2 = J[j2]
-                # print(k1, k2)
-                if A[k1, k2] == 0 and A[k2, k1] == 0:
-                    W[i, k1] = W[i, k1] + 1
-                    W[i, k2] = W[i, k2] + 1
-                    W[k1, k2] = W[k1, k2] + 1
-
-    W = W + W.T
-
-    # matlab use W = sparse(W + W')
-    # I think it is properly use W = W+W'T
-
-    return W
-
-
-def m9_motif(A):
-    B, U, G = directional_breakup(A)
-    W = np.zeros(G.shape)
-    N = G.shape[0]
-    # print(np.nonzero(U))
-    for i in range(N):
-        J1 = np.nonzero(U[i, :])[1]
-        # np.nonzero(x)中x不能是列向量,只能是行向量或者矩阵
-        J2 = np.nonzero(U[:, i].T)[1]
-        for j1 in range(len(J1)):
-            for j2 in range(len(J2)):
-                k1 = J1[j1]
-                k2 = J2[j2]
-                if A[k1, k2] == 0 and A[k2, k1] == 0:
-                    W[i, k1] = W[i, k1] + 1
-                    W[i, k2] = W[i, k2] + 1
-                    W[k1, k2] = W[k1, k2] + 1
-    W = W + W.T
-    return W
-
-
-def m10_motif(A):
-    W = m8_motif(A.T)
-    return W
-
-
-def m11_motif(A):
-    B, U, G = directional_breakup(A)
-    W = np.zeros(G.shape)
-    N = G.shape[0]
-    for i in range(N):
-        J1 = np.nonzero(B[i, :])[1]
-        J2 = np.nonzero(U[i, :])[1]
-        for j1 in range(len(J1)):
-            for j2 in range(len(J2)):
-                k1 = J1[j1]
-                k2 = J2[j2]
-                if A[k1, k2] == 0 and A[k2, k1] == 0:
-                    W[i, k1] = W[i, k1] + 1
-                    W[i, k2] = W[i, k2] + 1
-                    W[k1, k2] = W[k1, k2] + 1
-    W = W + W.T
-    return W
-
-
-def m12_motif(A):
-    W = m11_motif(A.T)
-    return W
-
-
-def m13_motif(A):
-    B, U, G = directional_breakup(A)
-    print('B\n', B)
-    W = np.zeros(G.shape)
-    N = G.shape[0]
-    for i in range(N):
-        J = np.nonzero(B[i, :])[1]
-        print(J)
-        for j1 in range(len(J)):
-            for j2 in range(j1 + 1, len(J)):
-                print(j1, j2)
-                k1 = J[j1]
-                k2 = J[j2]
-                if A[k1, k2] == 0 and A[k2, k1] == 0:
-                    W[i, k1] = W[i, k1] + 1
-                    W[i, k2] = W[i, k2] + 1
-                    W[k1, k2] = W[k1, k2] + 1
-    W = W + W.T
-    return W
-
-
-def bifan(A):
-    B, U, G = directional_breakup(A)
-    tmp = A.T
-    NA = np.logical_and((A == 0) * 1, (tmp == 0) * 1) * 1
-
-    # print('bifan U\n', U)
-    # print('bifan G\n', G)
-    # print('NA\n', NA)
-    W = np.zeros(G.shape)
-    W = np.mat(W)
-    # print('bifan W\n', W)
-    # print('bifan triu(NA, 1)\n', np.triu(NA, 1))
-    nzero_ind = np.nonzero(np.triu(NA, 1))
-    # print('bifan nzero_ind\n', nzero_ind[1].shape)
-
-    for ind in range(nzero_ind[0].shape[0]):
-        x = nzero_ind[0][ind]
-        y = nzero_ind[1][ind]
-        # print(x, y)
-        xout = np.nonzero(U[x, :])
-        yout = np.nonzero(U[y, :])
-        # print('bifan np.nonzero(U[x, :])\n', np.nonzero(U[x, :]))
-        # print('bifan np.nonzero(U[y, :])\n', np.nonzero(U[y, :]))
-        # print('bifan xout\n', xout)
-        # print('bifan yout\n', yout)
-        common = np.intersect1d(xout[1], yout[1])
-        # print('conmon\n',common)
-        nc = len(common)
-        # print('bifan nc', nc)
-        # print(common[0, 0])
-        for i in range(nc):
-            for j in range(i + 1, nc):
-                w = common[i]
-                v = common[j]
-                if NA[w, v] == 1:
-                    W[x, y] = W[x, y] + 1
-                    W[x, w] = W[x, w] + 1
-                    W[x, v] = W[x, v] + 1
-                    W[y, w] = W[y, w] + 1
-                    W[y, v] = W[y, v] + 1
-                    W[w, v] = W[w, v] + 1
-
-    # print(nzero_ind[0])
-    # print(nzero_ind[1])
-    # print(type(nzero_ind[0]))
-    # print('U\n', U)
-    # print('G\n', G)
-    # print('NA\n', NA)
-    # print('W\n', W)
-    # print('nzero_ind\n', nzero_ind)
-    # print(nzero_ind[0].shape[0])
-
-    W = W + W.T
-
-    # print(type(W))
-    # print(W)
-
-    return W
 
 
 def spectral_partitioning(A):
@@ -547,23 +351,6 @@ def largest_connect_component(A):
     return A
 
 
-def create_network(data):
-    DG = nx.DiGraph()
-    f = open(data, 'r')
-    line = f.readline()
-    while line[0] == '#':
-        # print(line)
-        line = f.readline()
-
-    while line:
-        edge = line.split()
-        # print(int(edge[0]), (edge[1]))
-        DG.add_edge(int(edge[0]), int(edge[1]))
-        line = f.readline()
-    f.close()
-    return DG
-
-
 def motif_m7(g):
     n = nx.number_of_nodes(g)
     W = np.zeros((n, n), dtype=float)
@@ -700,5 +487,217 @@ def motif_bifan(g):
                                 W[w, z] = W[w, z] + 1
                                 W[z, w] = W[z, w] + 1
                                 motif.append(sorted([u, v, w, z]))
+
+    return W
+
+
+def m1_motif(A):
+    B, U, G = directional_breakup(A)
+    W = np.multiply(U * U, U)
+    return W
+
+
+def m2_motif(A):
+    B, U, G = directional_breakup(A)
+    C = np.multiply(B * U, U.T) + np.multiply(U * B, U.T) + np.multiply(U * U, B)
+    W = C + C.T
+    return W
+
+
+def m3_motif(A):
+    B, U, G = directional_breakup(A)
+    C = np.multiply(B * B, U) + np.multiply(B * U, B) + np.multiply(U * B, B)
+    W = C + C.T
+    return W
+
+
+def m4_motif(A):
+    B, U, G = directional_breakup(A)
+    W = np.multiply(B * B, B)
+    return W
+
+
+def m5_motif(A):
+    B, U, G = directional_breakup(A)
+    T1 = np.multiply(U * U, U)
+    T2 = np.multiply((U.T) * U, U)
+    T3 = np.multiply(U * (U.T), U)
+    C = T1 + T2 + T3
+    W = C + C.T
+    return W
+
+
+def m6_motif(A):
+    B, U, G = directional_breakup(A)
+    C1 = np.multiply(U * B, U)
+    C1 = C1 + C1.T
+    C2 = np.multiply((U.T) * U, B)
+    W = C1 + C2
+    return W
+
+
+def m7_motif(A):
+    B, U, G = directional_breakup(A)
+    C1 = np.multiply((U.T) * B, U.T)
+    C1 = C1 + C1.T
+    C2 = np.multiply(U * (U.T), B)
+    W = C1 + C2
+    return W
+
+
+def m8_motif(A):
+    B, U, G = directional_breakup(A)
+    W = np.zeros(G.shape)
+    W = np.asmatrix(W)
+    N = G.shape[0]
+    # print('U\n', U)
+    for i in range(N):
+        J = np.nonzero(U[i, :])[1]
+        # print(J)
+        for j1 in range(len(J)):
+            for j2 in range(j1 + 1, len(J)):
+                k1 = J[j1]
+                k2 = J[j2]
+                # print(k1, k2)
+                if A[k1, k2] == 0 and A[k2, k1] == 0:
+                    W[i, k1] = W[i, k1] + 1
+                    W[i, k2] = W[i, k2] + 1
+                    W[k1, k2] = W[k1, k2] + 1
+
+    W = W + W.T
+
+    # matlab use W = sparse(W + W')
+    # I think it is properly use W = W+W'T
+
+    return W
+
+
+def m9_motif(A):
+    B, U, G = directional_breakup(A)
+    W = np.zeros(G.shape)
+    N = G.shape[0]
+    # print(np.nonzero(U))
+    for i in range(N):
+        J1 = np.nonzero(U[i, :])[1]
+        # np.nonzero(x)中x不能是列向量,只能是行向量或者矩阵
+        J2 = np.nonzero(U[:, i].T)[1]
+        for j1 in range(len(J1)):
+            for j2 in range(len(J2)):
+                k1 = J1[j1]
+                k2 = J2[j2]
+                if A[k1, k2] == 0 and A[k2, k1] == 0:
+                    W[i, k1] = W[i, k1] + 1
+                    W[i, k2] = W[i, k2] + 1
+                    W[k1, k2] = W[k1, k2] + 1
+    W = W + W.T
+    return W
+
+
+def m10_motif(A):
+    W = m8_motif(A.T)
+    return W
+
+
+def m11_motif(A):
+    B, U, G = directional_breakup(A)
+    W = np.zeros(G.shape)
+    N = G.shape[0]
+    for i in range(N):
+        J1 = np.nonzero(B[i, :])[1]
+        J2 = np.nonzero(U[i, :])[1]
+        for j1 in range(len(J1)):
+            for j2 in range(len(J2)):
+                k1 = J1[j1]
+                k2 = J2[j2]
+                if A[k1, k2] == 0 and A[k2, k1] == 0:
+                    W[i, k1] = W[i, k1] + 1
+                    W[i, k2] = W[i, k2] + 1
+                    W[k1, k2] = W[k1, k2] + 1
+    W = W + W.T
+    return W
+
+
+def m12_motif(A):
+    W = m11_motif(A.T)
+    return W
+
+
+def m13_motif(A):
+    B, U, G = directional_breakup(A)
+    print('B\n', B)
+    W = np.zeros(G.shape)
+    N = G.shape[0]
+    for i in range(N):
+        J = np.nonzero(B[i, :])[1]
+        print(J)
+        for j1 in range(len(J)):
+            for j2 in range(j1 + 1, len(J)):
+                print(j1, j2)
+                k1 = J[j1]
+                k2 = J[j2]
+                if A[k1, k2] == 0 and A[k2, k1] == 0:
+                    W[i, k1] = W[i, k1] + 1
+                    W[i, k2] = W[i, k2] + 1
+                    W[k1, k2] = W[k1, k2] + 1
+    W = W + W.T
+    return W
+
+
+def bifan(A):
+    B, U, G = directional_breakup(A)
+    tmp = A.T
+    NA = np.logical_and((A == 0) * 1, (tmp == 0) * 1) * 1
+
+    # print('bifan U\n', U)
+    # print('bifan G\n', G)
+    # print('NA\n', NA)
+    W = np.zeros(G.shape)
+    W = np.mat(W)
+    # print('bifan W\n', W)
+    # print('bifan triu(NA, 1)\n', np.triu(NA, 1))
+    nzero_ind = np.nonzero(np.triu(NA, 1))
+    # print('bifan nzero_ind\n', nzero_ind[1].shape)
+
+    for ind in range(nzero_ind[0].shape[0]):
+        x = nzero_ind[0][ind]
+        y = nzero_ind[1][ind]
+        # print(x, y)
+        xout = np.nonzero(U[x, :])
+        yout = np.nonzero(U[y, :])
+        # print('bifan np.nonzero(U[x, :])\n', np.nonzero(U[x, :]))
+        # print('bifan np.nonzero(U[y, :])\n', np.nonzero(U[y, :]))
+        # print('bifan xout\n', xout)
+        # print('bifan yout\n', yout)
+        common = np.intersect1d(xout[1], yout[1])
+        # print('conmon\n',common)
+        nc = len(common)
+        # print('bifan nc', nc)
+        # print(common[0, 0])
+        for i in range(nc):
+            for j in range(i + 1, nc):
+                w = common[i]
+                v = common[j]
+                if NA[w, v] == 1:
+                    W[x, y] = W[x, y] + 1
+                    W[x, w] = W[x, w] + 1
+                    W[x, v] = W[x, v] + 1
+                    W[y, w] = W[y, w] + 1
+                    W[y, v] = W[y, v] + 1
+                    W[w, v] = W[w, v] + 1
+
+    # print(nzero_ind[0])
+    # print(nzero_ind[1])
+    # print(type(nzero_ind[0]))
+    # print('U\n', U)
+    # print('G\n', G)
+    # print('NA\n', NA)
+    # print('W\n', W)
+    # print('nzero_ind\n', nzero_ind)
+    # print(nzero_ind[0].shape[0])
+
+    W = W + W.T
+
+    # print(type(W))
+    # print(W)
 
     return W
