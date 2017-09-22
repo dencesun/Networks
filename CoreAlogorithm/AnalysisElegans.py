@@ -91,24 +91,24 @@ def centrality(DG):
         f.close()
 
 
-def main():
-    data = '/home/sun/PycharmProjects/Network/C-elegans-frontal.txt'
-    # data = 'www.adj'
-    DG = create_network(data)
-
-    # draw_network(DG)
-    # clustering_coefficient(DG)
-    # centrality(DG)
-    degree_distribution(DG)
-
-if __name__ == '__main__':
-    main()
-
-    # DG = nx.DiGraph()
-    # DG.add_edge(1,2)
-    # print(DG.edges())
-    # # pos = nx.nx_agraph.graphviz_layout(DG)
-    # nx.draw_networkx(DG, pos = nx.spring_layout(DG))
-    # plt.show()
-    # plt.ishold()
-    # plt.draw(DG)
+# def main():
+#     data = '/home/sun/PycharmProjects/Network/C-elegans-frontal.txt'
+#     # data = 'www.adj'
+#     DG = create_network(data)
+#
+#     # draw_network(DG)
+#     # clustering_coefficient(DG)
+#     # centrality(DG)
+#     degree_distribution(DG)
+#
+# if __name__ == '__main__':
+#     main()
+#
+#     # DG = nx.DiGraph()
+#     # DG.add_edge(1,2)
+#     # print(DG.edges())
+#     # # pos = nx.nx_agraph.graphviz_layout(DG)
+#     # nx.draw_networkx(DG, pos = nx.spring_layout(DG))
+#     # plt.show()
+#     # plt.ishold()
+#     # plt.draw(DG)

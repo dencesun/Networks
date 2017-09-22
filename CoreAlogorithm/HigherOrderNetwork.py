@@ -549,18 +549,18 @@ def largest_connect_component(A):
 
 def create_network(data):
     DG = nx.DiGraph()
-    with open(data, 'r') as f:
+    f = open(data, 'r')
+    line = f.readline()
+    while line[0] == '#':
+        # print(line)
         line = f.readline()
-        while line[0] == '#':
-            print(line)
-            line = f.readline()
 
-        while line:
-            edge = line.split()
-            # print(int(edge[0]), (edge[1]))
-            DG.add_edge(int(edge[0]), int(edge[1]))
-            line = f.readline()
-        f.close()
+    while line:
+        edge = line.split()
+        # print(int(edge[0]), (edge[1]))
+        DG.add_edge(int(edge[0]), int(edge[1]))
+        line = f.readline()
+    f.close()
     return DG
 
 

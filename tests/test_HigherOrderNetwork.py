@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from CoreAlogorithm import HigerOrderNetwork as hon
-from time import time
+from CoreAlogorithm import *
 import networkx as nx
 from scipy.io import savemat
+
 
 def paper_figure1():
     """
@@ -34,8 +34,8 @@ def paper_figure1():
     g.add_edge(9, 8)
     g.add_edge(9, 10)
 
-    W = hon.motif_m7(g)
-    cluster, condv, condc, order = hon.spectral_partitioning(W)
+    W = HigherOrderNetwork.motif_m7(g)
+    cluster, condv, condc, order = HigherOrderNetwork.spectral_partitioning(W)
     print("paper figure1's result\n")
     print('condc: ', condc)
     print('cluser: ', cluster)
@@ -49,28 +49,24 @@ def paper_figure2():
 
     """
 
-    data = '..\data\C-elegans-frontal.txt'
-    DG = hon.create_network(data)
-    A = hon.create_adjacency(DG)
-    W = hon.motif_bifan(DG)
-    W = hon.largest_connect_component(W)
-    cluster, condv, condc, order = hon.spectral_partitioning(W)
+    data = '/Users/dencesun/Desktop/Networks/data/C-elegans-frontal.txt'
+    DG = HigherOrderNetwork.create_network(data)
+    A = HigherOrderNetwork.create_adjacency(DG)
+    W = HigherOrderNetwork.motif_bifan(DG)
+    W = HigherOrderNetwork.largest_connect_component(W)
+    cluster, condv, condc, order = HigherOrderNetwork.spectral_partitioning(W)
 
     print("largest_connect_component's shape: ", W.shape)
     print("C-elegans's result")
     print('condc: ', condc)
 
     # save as matlab file format
-    savemat('..\data\c-elegans.mat', {'W': W})
+    savemat('/Users/dencesun/Desktop/Networks/data/c-elegans.mat', {'W': W})
     print('complete save motif adjacency matrix in data')
 
 
-def main():
+def higher_order_network():
     paper_figure1()
     paper_figure2()
 
-if __name__ == '__main__':
-    start = time()
-    main()
-    end = time()
-    print('program runtime = ', str(end - start) + 's')
+
