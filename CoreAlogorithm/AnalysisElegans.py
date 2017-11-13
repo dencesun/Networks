@@ -10,7 +10,7 @@
 
 import networkx as nx
 import matplotlib.pyplot as plt
-from collections import Counter
+# from collections import Counter
 
 
 def create_network(data):

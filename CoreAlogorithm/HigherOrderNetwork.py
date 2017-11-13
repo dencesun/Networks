@@ -15,8 +15,8 @@ import numpy as np
 import math
 from scipy.sparse.csgraph import connected_components
 from scipy import linalg as SLA
-from numpy import linalg as NLA
-import matplotlib.pyplot as plt
+# from numpy import linalg as NLA
+# import matplotlib.pyplot as plt
 
 np.seterr(divide='ignore', invalid='ignore')
 
@@ -728,8 +728,319 @@ def count_m1(g):
                     count_number += 1
                     print(u, v, w)
                 elif g.has_edge(u, w) and g.has_edge(w, v) and g.has_edge(v, u) \
-                    and (not g.has_edge(w, u)) and (not g.has_edge(v, w)) and (g.has_edge(u, v)):
+                    and (not g.has_edge(w, u)) and (not g.has_edge(v, w)) and (not g.has_edge(u, v)):
                     count_number += 1
                     print(u, v, w)
 
-    print('0->1 1->2 2->0\n', count_number)
+    print('0->1 1->2 2->0: ', count_number)
+
+
+# count: 0->1 1->0 1->2 2->0
+def count_m2(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n+1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(v_len):
+                w = v_neighbors[j]
+                if w < v or w < u:
+                    continue
+                if g.has_edge(u, v) and g.has_edge(v, u):
+                    if g.has_edge(u, w) and g.has_edge(w, v) and (not g.has_edge(w, u)) and (not g.has_edge(v, w)):
+                        count_number += 1
+                        print(u, v, w)
+                    elif g.has_edge(v, w) and g.has_edge(w, u) and (not g.has_edge(w, v)) and (not g.has_edge(u, w)):
+                        count_number += 1
+                        print(u, v, w)
+                elif g.has_edge(u, w) and g.has_edge(w, u):
+                    if g.has_edge(w, v) and g.has_edge(v, u) and (not g.has_edge(v, w)) and (not g.has_edge(u, v)):
+                        count_number += 1
+                        print(u, v, w)
+                    elif g.has_edge(u, v) and g.has_edge(v, w) and (not g.has_edge(v, u)) and (not g.has_edge(w, v)):
+                        count_number += 1
+                        print(u, v, w)
+                elif g.has_edge(v, w) and g.has_edge(w, v):
+                    if g.has_edge(v, u) and g.has_edge(u, w) and (not g.has_edge(u, v)) and (not g.has_edge(w, u)):
+                        count_number += 1
+                        print(u, v, w)
+                    elif g.has_edge(w, u) and g.has_edge(u, v) and (not g.has_edge(u, w)) and (not g.has_edge(v, u)):
+                        count_number += 1
+                        print(u, v, w)
+    print('0->1 1->0 1->2 2->0: ', count_number)
+
+
+# count: 0->1 1->0 1->2 2->1 2->0
+def count_m3(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n + 1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(v_len):
+                w = v_neighbors[j]
+                if w < v or w < u:
+                    continue
+
+                if (not g.has_edge(u, v)) and g.has_edge(v, u) and g.has_edge(u, w) and g.has_edge(w, u) \
+                    and g.has_edge(v, w) and g.has_edge(w, v):
+                    print(u, v, w)
+                    count_number += 1
+                elif (not g.has_edge(v, u)) and g.has_edge(u, v) and g.has_edge(u, w) and g.has_edge(w, u) \
+                    and g.has_edge(v, w) and g.has_edge(w, v):
+                    print(u, v, w)
+                    count_number += 1
+                elif (not g.has_edge(u, w)) and g.has_edge(w, u) and g.has_edge(u, v) and g.has_edge(v, u) \
+                    and g.has_edge(w, v) and g.has_edge(v, w):
+                    print(u, v, w)
+                    count_number += 1
+                elif (not g.has_edge(w, u)) and g.has_edge(u, w) and g.has_edge(u, v) and g.has_edge(v, u) \
+                    and g.has_edge(w, v) and g.has_edge(v, w):
+                    print(u, v, w)
+                    count_number += 1
+                elif (not g.has_edge(w, v)) and g.has_edge(v, w) and g.has_edge(u, w) and g.has_edge(w, u) \
+                    and g.has_edge(v, u) and g.has_edge(u, v):
+                    print(u, v, w)
+                    count_number += 1
+                elif (not g.has_edge(v, w)) and g.has_edge(w, v) and g.has_edge(u, w) and g.has_edge(w, u) \
+                    and g.has_edge(v, u) and g.has_edge(u, v):
+                    print(u, v, w)
+                    count_number += 1
+
+    print('0->1 1->0 1->2 2->1 2->0: ', count_number)
+
+
+# count: 0->1 1->0 0->2 2->0 1->2 2->1
+def count_m4(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n + 1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(v_len):
+                w = v_neighbors[j]
+                if w < v or w < u:
+                    continue
+                if g.has_edge(u, v) and g.has_edge(v, u) and g.has_edge(u, w) and g.has_edge(w, u) \
+                    and g.has_edge(w, v) and g.has_edge(v, w):
+                    count_number += 1
+                    print(u, v, w)
+    print('0->1 1->0 0->2 2->0 1->2 2->1: ', count_number)
+
+
+# count: 0->1 0->2 1->2
+def count_m5(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n + 1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(v_len):
+                w = v_neighbors[j]
+                if w < v or w < u:
+                    continue
+                if g.has_edge(u, v) and (not g.has_edge(v,u)) and g.has_edge(u, w) and (not g.has_edge(w, u)):
+                    if g.has_edge(w, v) and (not g.has_edge(v, w)):
+                        count_number += 1
+                        print(u, v, w)
+                    elif g.has_edge(v, w) and (not g.has_edge(w, v)):
+                        count_number += 1
+                        print(u, v, w)
+                elif g.has_edge(v, u) and (not g.has_edge(u, v)) and g.has_edge(v, w) and (not g.has_edge(w, v)):
+                    if g.has_edge(u, w) and (not g.has_edge(w, u)):
+                        count_number += 1
+                        print(u, v, w)
+                    elif g.has_edge(w, u) and (not g.has_edge(u, w)):
+                        count_number += 1
+                        print(u, v, w)
+                elif g.has_edge(w, u) and (not g.has_edge(u, w)) and g.has_edge(w, v) and (not g.has_edge(v, w)):
+                    if g.has_edge(u, v) and (not g.has_edge(v, u)):
+                        count_number += 1
+                        print(u, v, w)
+                    elif g.has_edge(v, u) and (not g.has_edge(u, v)):
+                        count_number += 1
+                        print(u, v, w)
+
+    print('0->1 0->2 1->2: ', count_number)
+
+
+# count: 0->1 0->2 1->2 2->1
+def count_m6(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n + 1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(v_len):
+                w = v_neighbors[j]
+                if w < v or w < u:
+                    continue
+                if g.has_edge(u, v) and g.has_edge(v, u) and g.has_edge(w, u) and g.has_edge(w, v) \
+                    and (not g.has_edge(u, w)) and (not g.has_edge(v, w)):
+                    count_number += 1
+                    print(u, v, w)
+                elif g.has_edge(u, w) and g.has_edge(w, u) and g.has_edge(v, u) and g.has_edge(v, w) \
+                    and (not g.has_edge(u, v)) and (not g.has_edge(w, v)):
+                    count_number += 1
+                    print(u, v, w)
+                elif g.has_edge(v, w) and g.has_edge(w, v) and g.has_edge(u, v) and g.has_edge(u, w) \
+                    and (not g.has_edge(v, u)) and (not g.has_edge(w, u)):
+                    count_number += 1
+                    print(u, v, w)
+    print('0->1 0->2 1->2 2->1: ', count_number)
+
+
+# count: 0->1 0->2 1->0 1->2
+def count_m7(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n+1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(0, u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(0, v_len):
+                w = v_neighbors[j]
+                if w < u or w < v:
+                    continue
+                if g.has_edge(u, v) and g.has_edge(v, u) and g.has_edge(u, w) and g.has_edge(v, w) \
+                    and (not g.has_edge(w, u)) and (not g.has_edge(w, v)):
+                    count_number += 1
+                    print(u, v, w)
+                elif g.has_edge(u, w) and g.has_edge(w, u) and g.has_edge(u, v) and g.has_edge(w, u) \
+                    and (not g.has_edge(v, u)) and (not g.has_edge(v, w)):
+                    count_number += 1
+                    print(u, v, w)
+                elif g.has_edge(v, w) and g.has_edge(w, v) and g.has_edge(v, u) and g.has_edge(w, u) \
+                    and (not g.has_edge(u, v)) and (not g.has_edge(u, w)):
+                    count_number += 1
+                    print(u, v, w)
+    print('0->1 0->2 1->0 1->2: ', count_number)
+
+
+# count: 0->1 0->2
+def count_m8(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n + 1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(0, u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(0, v_len):
+                w = v_neighbors[j]
+                if w < u or w < v:
+                    continue
+                if g.has_edge(u, v) and g.has_edge(u, w) and (not g.has_edge(v, u)) and (not g.has_edge(w, u)) \
+                    and (not g.has_edge(w, v)) and (not g.has_edge(v, w)):
+                    count_number += 1
+                    print(u, v, w)
+                elif g.has_edge(v, u) and g.has_edge(v, w) and (not g.has_edge(u, v)) and (not g.has_edge(w, v)) \
+                    and (not g.has_edge(u, w)) and (not g.has_edge(w, u)):
+                    count_number += 1
+                    print(u, v, w)
+                elif g.has_edge(w, u) and g.has_edge(w, v) and (not g.has_edge(u, w)) and (not g.has_edge(v, w)) \
+                    and (not g.has_edge(u, v)) and (not g.has_edge(v, u)):
+                    count_number += 1
+                    print(u, v, w)
+
+    print('0->1 0->2: ', count_number)
+
+
+# count: 0->1 1->2
+def count_m9(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n + 1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(0, u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(0, v_len):
+                w = v_neighbors[j]
+                if w < u or w < v:
+                    continue
+
+
+# count: 1->0 2->0
+def count_m10(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n + 1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(0, u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(0, v_len):
+                w = v_neighbors[j]
+                if w < u or w < v:
+                    continue
+                if g.has_edge(v, u) and g.has_edge(w, u) and (not g.has_edge(u, v)) and (not g.has_edge(u, w)) \
+                    and (not g.has_edge(v, w)) and (not g.has_edge(w, v)):
+                    count_number += 1
+                    print(u, v, w)
+                elif g.has_edge(u, v) and g.has_edge(w, v) and (not g.has_edge(v, u)) and (not g.has_edge(v, w)) \
+                    and (not g.has_edge(u, w)) and ( not g.has_edge(w, u)):
+                    count_number += 1
+                    print(u, v, w)
+                elif g.has_edge(u, w) and g.has_edge(v, w) and (not g.has_edge(w, u)) and (not g.has_edge(w, v)) \
+                    and (not g.has_edge(u, v)) and (not g.has_edge(v, u)):
+                    count_number += 1
+                    print(u, v, w)
+
+    print('1->0 2->0: ', count_number)

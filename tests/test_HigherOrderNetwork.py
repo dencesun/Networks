@@ -34,12 +34,20 @@ def paper_figure1():
     g.add_edge(9, 8)
     g.add_edge(9, 10)
 
-    W = HigherOrderNetwork.motif_m7(g)
-    cluster, condv, condc, order = HigherOrderNetwork.spectral_partitioning(W)
-    print("\n\npaper figure1's result")
-    print('condc: ', condc)
-    print('cluster\n', cluster)
-    print(HigherOrderNetwork.count_m1(g))
+    # W = HigherOrderNetwork.motif_m7(g)
+    # cluster, condv, condc, order = HigherOrderNetwork.spectral_partitioning(W)
+    # print("\n\npaper figure1's result")
+    # print('condc: ', condc)
+    # print('cluster\n', cluster)
+    HigherOrderNetwork.count_m1(g)
+    HigherOrderNetwork.count_m2(g)
+    HigherOrderNetwork.count_m3(g)
+    HigherOrderNetwork.count_m4(g)
+    HigherOrderNetwork.count_m5(g)
+    HigherOrderNetwork.count_m6(g)
+    HigherOrderNetwork.count_m7(g)
+    HigherOrderNetwork.count_m8(g)
+    HigherOrderNetwork.count_m10(g)
 
 
 def paper_figure2():
@@ -52,8 +60,8 @@ def paper_figure2():
     # path for mac
     # data = '/Users/dencesun/Desktop/Networks/data/C-elegans-frontal.txt'
     # path for linux
-    data = '/home/sun/Desktop/Networks-master/data/C-elegans-frontal.txt'
-    # data = '../data/C-elegans-frontal.txt'
+    # data = '/home/sun/Desktop/Networks-master/data/C-elegans-frontal.txt'
+    data = '../data/C-elegans-frontal.txt'
     DG = HigherOrderNetwork.create_network(data)
     A = HigherOrderNetwork.create_adjacency(DG)
     W = HigherOrderNetwork.motif_bifan(DG)
@@ -74,6 +82,6 @@ def paper_figure2():
 
 def higher_order_network():
     paper_figure1()
-    paper_figure2()
+    # paper_figure2()
 
 
