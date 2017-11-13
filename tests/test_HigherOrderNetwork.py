@@ -39,6 +39,7 @@ def paper_figure1():
     print("\n\npaper figure1's result")
     print('condc: ', condc)
     print('cluster\n', cluster)
+    print(HigherOrderNetwork.count_m1(g))
 
 
 def paper_figure2():

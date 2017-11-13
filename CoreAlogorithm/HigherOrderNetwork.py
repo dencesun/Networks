@@ -701,3 +701,35 @@ def bifan(A):
     # print(W)
 
     return W
+
+
+# count motif numbers
+
+# count: 0->1 1->2 2->0
+def count_m1(g):
+    n = nx.number_of_nodes(g)
+    count_number = 0
+
+    for u in range(1, n+1):
+        u_neighbors = list(set(nx.all_neighbors(g, u)))
+        u_len = len(u_neighbors)
+        for i in range(0, u_len):
+            v = u_neighbors[i]
+            if v < u:
+                continue
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            v_len = len(v_neighbors)
+            for j in range(0, v_len):
+                w = v_neighbors[j]
+                if w < u or w < v:
+                    continue
+                if g.has_edge(u, v) and g.has_edge(v, w) and g.has_edge(w, u) \
+                    and (not g.has_edge(v, u)) and (not g.has_edge(w, v)) and (not g.has_edge(u, w)):
+                    count_number += 1
+                    print(u, v, w)
+                elif g.has_edge(u, w) and g.has_edge(w, v) and g.has_edge(v, u) \
+                    and (not g.has_edge(w, u)) and (not g.has_edge(v, w)) and (g.has_edge(u, v)):
+                    count_number += 1
+                    print(u, v, w)
+
+    print('0->1 1->2 2->0\n', count_number)
