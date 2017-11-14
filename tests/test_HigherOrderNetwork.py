@@ -84,7 +84,8 @@ def paper_figure2():
 
 
 def higher_order_network():
-    paper_figure1()
+    # paper_figure1()
     # paper_figure2()
-
-
+    data = '/home/sunxiaowei/Networks/data/celegans_full_data.adj'
+    g = HigherOrderNetwork.create_network(data)
+    HigherOrderNetwork.count_motif(g)

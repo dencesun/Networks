@@ -984,31 +984,26 @@ def count_m13(g, u, v, w):
 def count_motif(g):
     count_number = list([0])*13
     n = nx.number_of_nodes(g)
-    node_set = list()
+    node_set = set()
 
     for u in range(1, n+1):
-        u_neighbors = set(nx.all_neighbors(g, u))
-        if len(u_neighbors) == 0:
+        if not g.has_node(u):
             continue
-        for i in set(u_neighbors):
-            if i > u:
-                node_set.append(i)
-
-        node_set.sort()
-
-        for i in range(len(node_set)):
-            tmp = node_set[i+1: ]
-            v = node_set[i]
-            for i in set(nx.all_neighbors(g, v)):
-                if i > v:
-                    tmp.append(i)
-            if v == 9:
-                print('ttt: ', u, tmp)
-            tmp = set(tmp)
-
-            if len(tmp) == 0:
+        for v in range(u+1, n+1):
+            if not g.has_node(v):
                 continue
-            for w in tmp:
+            u_neighbors = list(set(nx.all_neighbors(g, u)))
+            v_neighbors = list(set(nx.all_neighbors(g, v)))
+            for i in u_neighbors:
+                if i > v and i > u:
+                    node_set.add(i)
+            for i in v_neighbors:
+                if i > v and i > u:
+                    node_set.add(i)
+            if len(node_set) <= 0:
+                continue
+            print(u, v, node_set)
+            for w in node_set:
                 if count_m1(g, u, v, w):
                     count_number[0] += 1
                 elif count_m2(g, u, v, w):
@@ -1036,6 +1031,6 @@ def count_motif(g):
                 elif count_m13(g, u, v, w):
                     count_number[12] += 1
 
-        node_set.clear()
+            node_set.clear()
 
     print(count_number)
